@@ -1,0 +1,13 @@
+---
+title: "Homeworks"
+author: "RMJ"
+date: "2025-01-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+here is an example of how we will link to homeworks 
+Week 1 Homework [HW1 Link](hw1.html)
