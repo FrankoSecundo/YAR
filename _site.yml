@@ -9,3 +9,5 @@ navbar:
       href: about.html
     - text: "Homeworks"
       href: homework_links.html
+    - text: "Notes"
+      href: note_links.html
