@@ -1,5 +1,5 @@
 name: "RJ's First, but very cool website"
-output_directory: docs
+output_dir: docs
 navbar:
   title: "RJ's First, but very cool website"
   left:
