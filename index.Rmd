@@ -4,4 +4,4 @@ title: "Hello, Hi, Welcome"
 
 Thank you for coming to my website! Here I will post nonsense but also assignments!
 
-![Site Bear says hello!](C:/Users/magic/OneDrive/Pictures/01-bear-waving-his-paw1.jpg)
+!["Site Bear says hello!"](pics/01-bear-waving-his-paw1.jpg)
