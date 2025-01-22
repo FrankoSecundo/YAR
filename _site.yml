@@ -1,0 +1,9 @@
+name: "RJ's First, but very cool website"
+output_directory: docs
+navbar:
+  title: "RJ's First, but very cool website"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "About"
+      href: about.html
