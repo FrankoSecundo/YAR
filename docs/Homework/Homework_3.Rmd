@@ -1,0 +1,333 @@
+---
+title: "Homework_3"
+author: "RMJ"
+date: "2025-01-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Note that for this assignment I will be using notepadd++
+
+## Problem 1
+
+This is the original text
+
+```
+First String    Second      1.22      3.4
+Second          More Text   1.555555  2.2220
+Third           x           3         124
+
+```
+
+and the desired output
+
+```
+First String,Second,1.22,3.4
+Second,More Text,1.555555,2.2220
+Third,x,3,124
+```
+
+Working Solution:
+
+```
+First I tried \t to find tabs and replace them figuring that would be the most direct approach. However, tabs did not show up when searched so I realized that it was spaces that I needed. I had to differentiate between a single space for inbetween words and more than 1 space that functioned as the tabs. But in so doing I saw that the end space also counted. My solution was to replace the end space return lines with something found nowhere else in the document (@) so i could preserve the return, and then looked for 2 or more consecutive spaces and replaced them with a comma. and then afterwards removed the @ and replaced it with nothing. Summarized below with the result
+
+\r replace with @
+
+\s{2,} replace with ,
+
+find and replace @
+
+Results:
+
+First String,Second,1.22,3.4
+Second,More Text,1.555555,2.2220
+Third,x,3,124
+
+```
+
+## Problem 2
+
+This is the original text
+
+```
+Ballif, Bryan, University of Vermont
+Ellison, Aaron, Harvard Forest
+Record, Sydne, Bryn Mawr
+
+```
+
+and the desired output
+
+```
+Bryan Ballif (University of Vermont)
+Aaron Ellison (Harvard Forest)
+Sydne Record (Bryn Mawr)
+
+```
+Working Solution:
+
+```
+
+what i need it to do is identfy each line separately, then find the first, second, and third word groups 
+then swap the second and first and keep the third as is except surround it with parentheses. What I decided to do was treat this as 5 captures.
+1. first word
+2. first instance of , 
+3. second word
+4. second instance of , 
+5. The rest
+
+which results in (\w+)(\, )(\w+)(\, )(.*)
+now all I need to do is regurgitate them in the right order and slide a parenthesis in there thus
+
+the replace
+\3 \1 \(\5\)
+
+results:
+
+Bryan Ballif (University of Vermont)
+Aaron Ellison (Harvard Forest)
+Sydne Record (Bryn Mawr)
+
+
+```
+## Problem 3
+
+This is the original text
+
+```
+0001 Georgia Horseshoe.mp3 0002 Billy In The Lowground.mp3 0003 Winder Slide.mp3 0004 Walking Cane.mp3
+
+```
+
+and the desired output
+
+```
+0001 Georgia Horseshoe.mp3
+0002 Billy In The Lowground.mp3
+0003 Winder Slide.mp3
+0004 Walking Cane.mp3
+
+```
+Working Solution:
+
+```
+What I'm thinking is that I need to group each number and song as a unit and then replace them with a return inbetween. so we need to find essentially 4 numbers sequentially, a bunch of words, and a .mp3
+BUT what would be easier is finding a characteristic line start and replacing that with a new line. So what I did was have it look for the sequence of 4 numbers, capture that, replace it with a new line which should break up the text by line
+
+thus
+
+search:  (\d{4,})
+replace: \n\1 
+
+Results
+
+
+0001  Georgia Horseshoe.mp3 
+0002  Billy In The Lowground.mp3 
+0003  Winder Slide.mp3 
+0004  Walking Cane.mp3
+
+this does however end up giving us a blank line on top but that is fairly easily removed BUT we can modify the code such that we are searching for 
+   (\d{4,})
+but only keeping the number sequence
+
+```
+
+## Problem 4
+
+This is the original text
+
+```
+0001 Georgia Horseshoe.mp3
+0002 Billy In The Lowground.mp3
+0003 Winder Slide.mp3
+0004 Walking Cane.mp3
+
+```
+
+and the desired output
+
+```
+Georgia Horseshoe_0001.mp3
+Billy In The Lowground_0002.mp3
+Winder Slide_0003.mp3
+Walking Cane_0004.mp3
+
+```
+Working Solution:
+
+```
+ Again we want to grab the numbers so we can use the expression for finding them from the previous problem. What we then want to do is group the song title as its own thing distinctive from the .mp3. fortunately notepad++ seems to be smart enough to know that if part of search is in the previous search to separate them. Lucky! So what we do is capture the number, the title, and the .mp3 and replace them in the changed order with the underscore
+ 
+Search: (\d{4,}) (.*)(.mp3)
+replace: \2\_\1\3
+
+Result:
+Georgia Horseshoe_0001.mp3
+Billy In The Lowground_0002.mp3
+Winder Slide_0003.mp3
+Walking Cane_0004.mp3
+
+
+```
+
+## Problem 5
+
+This is the original text
+
+```
+Camponotus,pennsylvanicus,10.2,44
+Camponotus,herculeanus,10.5,3
+Myrmica,punctiventris,12.2,4
+Lasius,neoniger,3.3,55
+
+```
+
+and the desired output
+
+```
+C_pennsylvanicus,44
+C_herculeanus,3
+M_punctiventris,4
+L_neoniger,55
+
+```
+Working Solution:
+
+```
+
+This one is a mixture of grabbing some parts and ignoring others. I broke it down to capture the first letter of the first word, grab whatever word appeared after a comma, find whatever combination of number period number came before another comma, and then capture the remainder. Then combine the first letter, underscore, second word, and last number
+
+Search: (\w)\w+,(\w+),\d*.\d,(.*)
+Replace: \1\_\2,\3
+
+Results:
+
+C_pennsylvanicus,44
+C_herculeanus,3
+M_punctiventris,4
+L_neoniger,55
+
+
+```
+## Problem 6
+
+This is the original text
+
+```
+Camponotus,pennsylvanicus,10.2,44
+Camponotus,herculeanus,10.5,3
+Myrmica,punctiventris,12.2,4
+Lasius,neoniger,3.3,55
+
+```
+
+and the desired output
+
+```
+C_penn,44
+C_herc,3
+M_punc,4
+L_neon,55
+
+```
+Working Solution:
+
+```
+
+This only required minor modifications to the original code at least how I had written it. We needed to modify how the expression grabbed the second word and essentially mirror how it treated the first word accept grabbing only the first 4 letters. The trick is making it acknowledge that while we want the first 4 letters there is more word attached to that before the ,. Everything else stays the same
+
+Search: (\w)\w+,(\w{4})\w+,\d*.\d,(.*)
+Replace: \1\_\2,\3
+
+
+
+```
+
+## Problem 7
+
+This is the original text
+
+```
+Camponotus,pennsylvanicus,10.2,44
+Camponotus,herculeanus,10.5,3
+Myrmica,punctiventris,12.2,4
+Lasius,neoniger,3.3,55
+
+```
+
+and the desired output
+
+```
+Campen, 44, 10.2
+Camher, 3, 10.5
+Myrpun, 4, 12.2
+Lasneo, 55, 3.3
+
+```
+Working Solution:
+
+```
+
+For this we need to build off of some of the previous code. We'll use the same expression to grab the first three letters of the first and second word. the addition is that we now want to capture the collection of numbers that follows these words. But we have written in vaguely enough such that any combination of digits will work. And as before we want to capture the last number. From there it is just a matter of replacing them in the right order. 
+
+Search:(\w{3})\w+,(\w{3})\w+,(\d*.\d),(.*)
+Replace:\1\2, \4, \3
+
+
+Results:
+
+Campen, 44, 10.2
+Camher, 3, 10.5
+Myrpun, 4, 12.2
+Lasneo, 55, 3.3
+
+
+```
+
+## Problem 8
+
+```
+
+this is the original hideous text that should be put down and the person who dared to release this into the internet without cleaning it first should be tried for their crimes. But I digress
+
+id,target_name,pathogen_binary,sampling_date,site_code,field_id,bombus_spp,host_plant,bee_caste,sampling_event,pathogen_load
+1,BQCV,1,9/9/2020,BOST,6,imp*atiens,solidago,worker ,4,2414168.805
+3,BQCV,NA,9/10/2020,MUDGE,18,impatiens,c!rown vetch,worker ,4,760793.2324
+4,BQCV,NA,9/10/2020,MUDGE,11,im&patiens,c$rown vetch,worker,4,0
+5,BQCV,NA,9/9/2020,BOST,11,impatiens,sol)idago,male ,4,0
+6,BQCV,NA,9/10/2020,CIND,14,-i@mp#a^tiens,k*no%t w%eed,worker ,4,124236.7921
+8,BQCV,NA,9/10/2020,MUDGE,4,impatiens,crown v$et(ch,worker,4,413814.5638
+10,BQCV,1,9/10/2020,CIND,13,impatien$s,red clover,worker,4,1028831.605
+11,BQCV,NA,7/7/2020,BOST,38,impatiens,red clover,worker,2,307696378.8
+12,BQCV,NA,9/10/2020,MUDGE,5,_imp*atiens,c+rown vetch,worker,4,0
+13,BQCV,1,9/9/2020,BOST,12,impatien+s,solid#ago,male,4,311873.0526
+15,BQCV,0,9/9/2020,BOST,18,_impatiens,solidag)o,worker ,4,0
+16,BQCV,NA,9/9/2020,BOST,23,impati+e(ns,s!olidago,male,4,1674951.391
+17,BQCV,NA,9/10/2020,CIND,20,impa#tiens,red cl$over,worker,4,3214026.976
+18,BQCV,1,9/10/2020,CIND,11,i^m+patiens,bi_rdsfoo_t,worker ,4,995592.63
+19,BQCV,NA,9/10/2020,CIND,17,i%mpatiens,red+ @clover,worker,4,0
+20,BQCV,1,9/10/2020,CIND,16,imp(atiens,#red c_lover,worker,4,200804.8542
+21,BQCV,1,9/9/2020,BOST,17,impatiens,solid@ago,worker ,4,228085.8104
+22,BQCV,1,9/9/2020,BOST,7,impati^ens,solidago,worker,4,7261151.315
+23,BQCV,NA,7/7/2020,COL,22,)impati^ens,red clov#er,worker ,2,817906.8276
+24,BQCV,1,7/7/2020,BOST,45,impatiens,red_ cl)over,worker,2,858658.6884
+
+to clean we need to 
+
+1. remove the NAs 
+2. assassinate the special characters which include: - @ # * ! ) $ + %
+
+[^!@#$%^&*()_-+=]
+
+
+(\d*),(\w{4}),(\d.*),(\d.*),(\w{4,5}),(\d*),([^a-zA-z]),([^a-zA-Z]),([^a-zA-Z]),(\d*),(\d*)
+
+(\d*),(\w{4}),([^0-9NA])
+
+(\d*),(\w{4}),[\d*],(\d\/\d{1,2}\/\d{4}),
+
