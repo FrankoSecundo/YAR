@@ -498,22 +498,124 @@ L_neoniger,55
 </code></pre>
 <p>Working Solution:</p>
 <pre><code>
+This one is a mixture of grabbing some parts and ignoring others. I broke it down to capture the first letter of the first word, grab whatever word appeared after a comma, find whatever combination of number period number came before another comma, and then capture the remainder. Then combine the first letter, underscore, second word, and last number
 
+Search: (\w)\w+,(\w+),\d*.\d,(.*)
+Replace: \1\_\2,\3
+
+Results:
+
+C_pennsylvanicus,44
+C_herculeanus,3
+M_punctiventris,4
+L_neoniger,55
 
 </code></pre>
 </div>
 <div id="problem-6" class="section level2">
 <h2>Problem 6</h2>
 <p>This is the original text</p>
-<pre><code>
+<pre><code>Camponotus,pennsylvanicus,10.2,44
+Camponotus,herculeanus,10.5,3
+Myrmica,punctiventris,12.2,4
+Lasius,neoniger,3.3,55
 </code></pre>
 <p>and the desired output</p>
-<pre><code>
+<pre><code>C_penn,44
+C_herc,3
+M_punc,4
+L_neon,55
 </code></pre>
 <p>Working Solution:</p>
 <pre><code>
+This only required minor modifications to the original code at least how I had written it. We needed to modify how the expression grabbed the second word and essentially mirror how it treated the first word accept grabbing only the first 4 letters. The trick is making it acknowledge that while we want the first 4 letters there is more word attached to that before the ,. Everything else stays the same
+
+Search: (\w)\w+,(\w{4})\w+,\d*.\d,(.*)
+Replace: \1\_\2,\3
 
 
+</code></pre>
+</div>
+<div id="problem-7" class="section level2">
+<h2>Problem 7</h2>
+<p>This is the original text</p>
+<pre><code>Camponotus,pennsylvanicus,10.2,44
+Camponotus,herculeanus,10.5,3
+Myrmica,punctiventris,12.2,4
+Lasius,neoniger,3.3,55
+</code></pre>
+<p>and the desired output</p>
+<pre><code>Campen, 44, 10.2
+Camher, 3, 10.5
+Myrpun, 4, 12.2
+Lasneo, 55, 3.3
+</code></pre>
+<p>Working Solution:</p>
+<pre><code>
+For this we need to build off of some of the previous code. We&#39;ll use the same expression to grab the first three letters of the first and second word. the addition is that we now want to capture the collection of numbers that follows these words. But we have written in vaguely enough such that any combination of digits will work. And as before we want to capture the last number. From there it is just a matter of replacing them in the right order. 
+
+Search:(\w{3})\w+,(\w{3})\w+,(\d*.\d),(.*)
+Replace:\1\2, \4, \3
+
+
+Results:
+
+Campen, 44, 10.2
+Camher, 3, 10.5
+Myrpun, 4, 12.2
+Lasneo, 55, 3.3
+
+</code></pre>
+</div>
+<div id="problem-8" class="section level2">
+<h2>Problem 8</h2>
+<pre><code>
+this is the original hideous text that should be put down and the person who dared to release this into the internet without cleaning it first should be tried for their crimes. But I digress
+
+
+first replace the NAs with nothing since a 0 would be meaningful in the context of this dataset
+
+search: \,NA,
+replace: \,\,
+
+then remove all special characters
+
+search: [\!\-\@\#\*\%\^\)\(\+\$\&amp;]
+replace:
+
+then catch the trailing space after worker in some instances
+
+search \s,
+replace: \,
+
+and lastly remove the errant underscores. The trick here is that we only want to grab underscored that are in the rows not the columns but in notepad++ it is a simple matter of only selecting the area we are interestedin and making sure that the &#39;in selection&#39; box is checked
+
+search: \_
+replace:
+
+Final Output:
+
+id,target_name,pathogen_binary,sampling_date,site_code,field_id,bombus_spp,host_plant,bee_caste,sampling_event,pathogen_load
+1,BQCV,1,9/9/2020,BOST,6,impatiens,solidago,worker,4,2414168.805
+3,BQCV,,9/10/2020,MUDGE,18,impatiens,crown vetch,worker,4,760793.2324
+4,BQCV,,9/10/2020,MUDGE,11,impatiens,crown vetch,worker,4,0
+5,BQCV,,9/9/2020,BOST,11,impatiens,solidago,male,4,0
+6,BQCV,,9/10/2020,CIND,14,impatiens,knot weed,worker,4,124236.7921
+8,BQCV,,9/10/2020,MUDGE,4,impatiens,crown vetch,worker,4,413814.5638
+10,BQCV,1,9/10/2020,CIND,13,impatiens,red clover,worker,4,1028831.605
+11,BQCV,,7/7/2020,BOST,38,impatiens,red clover,worker,2,307696378.8
+12,BQCV,,9/10/2020,MUDGE,5,impatiens,crown vetch,worker,4,0
+13,BQCV,1,9/9/2020,BOST,12,impatiens,solidago,male,4,311873.0526
+15,BQCV,0,9/9/2020,BOST,18,impatiens,solidago,worker,4,0
+16,BQCV,,9/9/2020,BOST,23,impatiens,solidago,male,4,1674951.391
+17,BQCV,,9/10/2020,CIND,20,impatiens,red clover,worker,4,3214026.976
+18,BQCV,1,9/10/2020,CIND,11,impatiens,birdsfoot,worker,4,995592.63
+19,BQCV,,9/10/2020,CIND,17,impatiens,red clover,worker,4,0
+20,BQCV,1,9/10/2020,CIND,16,impatiens,red clover,worker,4,200804.8542
+21,BQCV,1,9/9/2020,BOST,17,impatiens,solidago,worker,4,228085.8104
+22,BQCV,1,9/9/2020,BOST,7,impatiens,solidago,worker,4,7261151.315
+23,BQCV,,7/7/2020,COL,22,impatiens,red clover,worker,2,817906.8276
+24,BQCV,1,7/7/2020,BOST,45,impatiens,red clover,worker,2,858658.6884
 </code></pre>
 </div>
 
