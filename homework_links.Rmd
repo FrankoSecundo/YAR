@@ -1,0 +1,24 @@
+---
+title: "homework_links"
+author: "RMJ"
+date: "2025-02-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Homework 3
+
+[Week 3 Homework Markdown](Homework/Homework_3.Rmd)
+
+[Week 3 Homework Html](Homework/Homework_3.html)
+
+
+### Homework 4
+
+[Week 4 Homework Markdown](Homework/Homework_4.Rmd)
+
+[Week 4 Homework Html](Homework/Homework_4.html)
+

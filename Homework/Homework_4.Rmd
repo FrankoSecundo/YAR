@@ -1,0 +1,157 @@
+---
+title: "Homework_4"
+author: "RMJ"
+date: "2025-02-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Problem 1. 
+
+**Suppose x = 1.1, a = 2.2, and b = 3.3. Assign each expression to the value of the variable z and print the value stored in z.**
+
+```{r}
+x <- 1.1 
+a <- 2.2
+b <- 3.3
+
+# a. 
+
+z <- x^(a^b)
+print(z)
+
+#[1] 7.413
+
+# b. 
+
+z <- (x^a)^b
+print(z)
+#[1] 3.61714
+
+#c
+
+z <- ((3*x^3)+(2*x^2)+1)
+print(z)
+#[1] 7.413
+
+```
+
+#### Problem 2.
+
+**Using the rep and seq functions, create the following vectors:**
+
+(1,2,3,4,5,6,7,8,7,6,5,4,3,2,1)
+(1,2,2,3,3,3,4,4,4,4,5,5,5,5,5)
+(5,4,4,3,3,3,2,2,2,2,1,1,1,1,1)
+
+```{r}
+
+a <- c(seq(1,8),seq(7,1))
+print(a)
+
+b <- rep(x=seq(1,5),times=seq(1,5))
+
+print(b)
+
+c <- rep(x=seq(5,1),times=seq(1,5))
+print(c)
+
+```
+
+#### Problem 3
+
+**Create a vector of two random uniform numbers. In a spatial map, these can be interpreted as x and y coordinates that give the location of an individual (such as a marked forest tree in a plot that has been mapped). Using one of R’s inverse trigonometry functions (asin(), acos(), or atan()), convert these numbers into polar coordinates (If you don’t know what polar coordinates are, read about them on the web here, here, or in your calculus textbook).**
+
+need to find r and theta
+
+```{r}
+x <- runif(100)[1]
+y <- runif(100)[1]
+
+ccoord <- c(x,y)
+
+r <- sqrt((x^2)+(y^2))
+
+theta <- asin(y/r)
+
+pcord <- c(r,theta)
+
+print(ccoord)
+print(pcord)
+```
+
+#### Problem 4
+
+**Create a vector queue <- c("sheep", "fox", "owl", "ant") where queue represents the animals that are lined up to enter Noah’s Ark, with the sheep at the front of the line. Using R expressions, update queue as:**
+
+1. the serpent arrives and gets in line;
+2. the sheep enters the ark;
+3. the donkey arrives and talks his way to the front of the line;
+4. the serpent gets impatient and leaves;
+5. the owl gets bored and leaves;
+6. the aphid arrives and the ant invites him to cut in line.
+7. Finally, determine the position of the aphid in the line.
+
+```{r}
+
+ss <- "serpent"
+dk <- "donkey"
+ap <- "aphid"
+
+#0
+queue <-c("sheep","fox","owl","ant")
+print(queue)
+
+#1
+queue <- c(queue,ss)
+print(queue)
+
+#2
+queue <- queue[2:length(queue)]
+print(queue)
+
+#3
+queue <- c(dk,queue)
+print(queue)
+
+#4
+queue <- queue[!queue=="serpent"]
+print(queue)
+
+#5
+queue <- queue[!queue=="owl"]
+print(queue)
+
+#6 
+pant <- which(queue=="ant")
+
+queue <- c(queue[1:pant-1],"aphid",queue[pant:length(queue)])
+
+print(queue)
+
+#7
+which(queue=="aphid")
+
+```
+
+
+#### Problem 5
+
+**Use R to create a vector of all of the integers from 1 to 100 that are not divisible by 2, 3, or 7. You will need one of the arithmetic operators on this cheat sheet.**
+```{r}
+
+hun <- c(1:100)
+hunr <- (hun%%2==0) | (hun%%3==0) | (hun%%7 == 0)
+
+grab <- which(hunr==FALSE)
+
+num <- hun[grab]
+
+print(num)
+
+
+```
+

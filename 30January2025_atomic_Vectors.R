@@ -2,6 +2,9 @@
 # 30 January 2025
 # RMJ
 
+
+################## 30 January 2025 ##################
+
 # create an empty vector, specify mode and length
 
 z <- vector(mode='numeric', length = 0)
@@ -218,3 +221,100 @@ z[which(z<3)] #this also works but is kinda superfulous
 #can also use length() for relative positioning to last element. this will give the first two elements
 
 z[-(length(z):(length(z)-2))]
+
+######################################
+
+
+################## 4 February 2025 ##################
+
+
+z <- c(3.1,9.2,0.4,7.5,6.6)
+
+#there is a letters vector that will let you just grab alpha letter
+names(z) <- letters[1:5]
+
+#and now we can subset using the names as opposed to the position number
+
+z[c("b","c")]
+
+########## Operators used with vectors
+
+# inequality and comparison operators
+
+# <, >, ==, >=, <=
+
+# logicals
+
+# ! = not
+# & and (vector)
+# | #or (vector)
+# xor (x,y) note that one of them has to be true
+
+x <- 1:5
+y <- c(1:3,7,7)
+
+#we can make logical questions and get boolean responses
+
+x == 2
+x != 2
+
+#compound statements
+
+x == 1 & y == 7
+
+#this will line up the vectors from left to right basically ask if there is an alignment where this is true
+
+#there is not
+
+#however if we do OR instead that chnages
+
+x == 1 | y == 7
+
+#nice, some of these are TRUE
+
+x == 3 | y == 3
+
+#xor instead
+
+xor(x==3,y==3)
+
+#this does not give us a true value. this is because xor is a 'one or the other' rule. it CANNOT have both be true.
+
+z2 <- 5
+
+#for the statement
+
+z2 == 4 | 6
+
+# the answer should be false but it isn't because it is not a full statement
+#this is a full statement
+
+z2 == 4 | z2 == 6
+
+############ subsetting
+
+#set the random seed
+
+z <- runif(10)
+
+print(z)
+
+
+set.seed(626)
+
+z < 0.5 # create a logical vector
+
+#this will actually pull out the values that are TRUE
+
+z[z<0.5]
+
+# but this will remove the values that don't match. if we want the positions though
+
+which(z<0.5)
+
+#and this give an identical result
+z[which(z<0.5)]
+
+#this won't work with missing values
+
+
