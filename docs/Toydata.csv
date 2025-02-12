@@ -1,0 +1,8 @@
+# comments at the top,,,
+# beaucoup metadata,,,
+ID,Treatment,Biomass,Notes
+1,Control,30.3,
+2,HighN,13,
+#A comment! Right in the middle of my salad! Its more likely than you'd think,,,
+3,HighN,NA,broken scale
+4,Control,35.3,

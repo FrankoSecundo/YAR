@@ -1,0 +1,227 @@
+---
+title: "Homework_5"
+author: "RMJ"
+date: "2025-02-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Problem 1
+```{r}
+
+#create n_dims and assign it a random integer 
+
+n_dims <- sample(3:10,1,replace=TRUE)
+print(n_dims)
+
+#create a vector of consecutive integers from 1 to n_dims
+
+nd_c <- (1:(n_dims)^2)
+
+print(nd_c)
+
+#use sample to randomly reshuffle
+
+nd_cs <- sample(nd_c,length(nd_c),replace=FALSE)
+
+print(nd_cs)
+
+str(nd_cs)
+
+#create a square matrix with these values
+
+#now we can make a square matrix
+
+sm <- matrix(data = nd_cs,nrow = sqrt(length(nd_cs)) )
+
+#print out the matrix
+
+print(sm)
+
+#the simplest way to transpose a matrix, flip it, is just t (like in matlab)
+
+sm.t <- t(sm)
+
+#lets look at the before and after
+
+print(sm)
+print(sm.t)
+
+#interesting, so now the first row becomes the first column and the second row the second column, etc.
+
+#calculate the sum and mean of the elements of the first row and last row
+
+rsum1 <- sum(sm.t[1,])
+rsumL <- sum(sm.t[nrow(sm.t),])
+
+rmean1 <- mean(sm.t[1,])
+rmeanL <- mean(sm.t[nrow(sm.t),])
+
+#now let's learn about eigen values (oh boy.)
+
+#note this is commented out for the markdown but ran in practice
+# ?eigen()
+
+#the most important part of this is that we need to tell it whether our matrix is symmetrical or not. It is not, so symmetric will be FALSE
+
+#this will calculate both the eigen values and eigen vectors
+
+sm.t.Vec <- eigen(sm,symmetric=FALSE,only.values = FALSE)
+
+str(sm.t.Vec)
+
+#ah so the output is a list and within that list the values, the values (output) are complex numbers and the vectors are a matrix of complex numbers let's verify
+
+typeof(sm.t.Vec$values)
+typeof(sm.t.Vec$vectors)
+
+#they complex. 
+
+#just for fun lets separate them
+
+sm.t.val <- sm.t.Vec$values
+sm.t.vectors <- sm.t.Vec$vectors
+
+#now lets' run the code again. First we'll store the old matrix to compare
+# 
+# sm1 <- sm
+
+#and we commented the previous line out so it doesn't override
+
+#rerun the code
+
+#new sm
+
+sm2 <- sm
+
+#this time we had a 3x3 matrix which gave very different values which were not complex, they were doubles
+
+
+```
+### Problem 2
+
+```{r}
+
+#it's time to make lists babes! Let's go!!!!!
+
+# first element of the list
+
+#we need to create a matrix filled with random uniform values. we'll generate some values first (we need 16)
+
+rv <- runif(16,min = 1,max = 100)
+
+#make the matrix
+my_matrix <- matrix(data = rv,nrow = sqrt(length(rv)))
+#check it
+print(my_matrix)
+
+#looks good moving on
+
+#element two, a logical.
+
+#we need to create a series of 100 TRUE or FALSE values.
+
+#I'm a fan of binary so let's go with that
+
+#first we'll create a 100 element binary vector by sampling from 1 or 0
+
+rbi <- sample(0:1,100,replace = TRUE)
+
+#now we will create an inequality. we'll keep it simple with a >0
+
+rbi.logic <- rbi>0
+
+#and move it to its own object
+
+my_logical <- rbi.logic
+
+#last element in the list will be a letters vector.
+
+#we'll use the sample function to randomly select the letters in a random order and put that into an object
+
+my_letters<- sample(letters[1:26],26,replace = FALSE)
+
+# THE ALL TOGETHER!
+my_big_bad_list <- list(my_matrix=my_matrix,my_logical=my_logical,my_letters=my_letters)
+
+#check it out now, funk, soul, brother
+print(my_big_bad_list)
+
+#we now need to grab specific elements and put them into a new list
+
+new_list <- list(mini_mat=my_big_bad_list$my_matrix[2,2],mini_log=my_big_bad_list$my_logical[2],mini_let=my_big_bad_list$my_letters[2])
+
+#lets store each of the element types as their own thing
+
+t1 <- typeof(new_list$mini_mat)
+t2 <- typeof(new_list$mini_log)
+t3 <- typeof(new_list$mini_let)
+
+#and then voltron them together
+ta <- c(t1,t2,t3)
+
+#check the type
+typeof(ta)
+
+#its quite the character......hahahahhahahhahahahah
+
+
+
+```
+### Problem 3
+
+```{r}
+
+#alright, we're in the Dataframe wild west now pawtnah! 
+
+#lets make a new dataframe but first we'll make the stuffin
+
+#uniform values
+
+ru <- runif(26,min = 0,max = 10)
+
+#get random letters
+
+rl <- sample(LETTERS[1:26],size = 26,replace = FALSE)
+
+#and smoosh it into a dataframe. 
+
+df <- data.frame(my_unis=ru,my_letters=rl)
+
+#check it yo
+head(df)
+
+#we'll make a copy so we don't fork up the original
+df2 <- df
+
+#and in one line BAM! we infect it with NAs
+
+df2[c(sample(1:26,size=4,replace=FALSE)),1] <- NA
+
+#we'll identify the NAs and might as well grab them why not
+
+df2[c(which(!complete.cases(df2))),]
+
+#and we can reorder them! using the order function. The important thing is that order give you the index 
+
+df3<- df2[order(df2$my_letters,decreasing = FALSE),]
+
+#and lastly lets get the mean of our numerical column
+
+mean(df3$my_unis)
+
+#oh sneaky sneaky there are NAs in there so we have to remove them first we'll just take the complete cases and put them into a new dataframe
+
+df4 <- df3[c(which(complete.cases(df3))),]
+
+#lol we got this. Alright, once again with the mean
+
+myunis.mean <- mean(df4$my_unis)
+
+print(myunis.mean)
+
+
+```

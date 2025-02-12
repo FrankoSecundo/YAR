@@ -141,3 +141,171 @@ d_frame <- data.frame(var_a,var_b,var_c)
 
 print(d_frame)
 str(d_frame)
+
+
+########################## 6 February ####################
+
+
+# adding a new row it has to come in as a list
+
+new_data <- list(var_a=13,var_b="Bottom",var_c=runif(1))
+
+print(new_data)
+str(new_data)
+
+#using rbind (old data frame, new dataframe)
+
+d_frame <- rbind(d_frame,new_data)
+str(d_frame)
+#and we can check the new row
+tail(d_frame)
+
+
+#But what if you want to add a new column?
+#too bad
+
+#bitch
+
+#make a new variable
+
+new_var <- runif(13) #note this matches the number of rows
+d_frame <- cbind(d_frame,new_var)
+
+#note that it will automatically take the object name as the column name
+head(d_frame)
+
+
+# we are going to create a new matrix to play with
+
+z_mat <- matrix(data = 1:30,ncol = 3,byrow = TRUE)
+z_dframe <- as.data.frame(z_mat) #this will smush the matrix into the dataframe
+
+str(z_mat)
+str(z_dframe)
+
+head(z_dframe)
+head(z_mat)
+
+#note that the column names are auto assigned in the dataframe
+
+#if we wanted to grab a specific element the syntax between matrix and dataframe are the same
+
+z_mat[3,3]
+z_dframe[3,3]
+
+z_mat[,3] #this means ignore the row grab the entire column
+z_dframe[,3]
+
+z_mat[3,] #ignore the column grab the entire row
+z_dframe[3,]
+
+z_mat[2] #will grab the second element of the atomic vector (going from top to bottom)
+z_dframe[2] #this will assume you meant the second variable aka the second column
+
+z_dframe["V2"]
+z_dframe$V2
+
+
+################ Eliminating NAs
+
+zd <- runif(14)
+#add in random NAs
+zd[c(1,5,8)] <- NA
+
+print(zd)
+
+#this function complete_cases will do a boolean assessment on whether each spot is a number or not. TRUE=is number FALSE=is not number
+complete.cases(zd)
+zd[complete.cases(zd)]
+
+which(!complete.cases(zd)) #this finds the positions of FALSE note that with the ! it means NOT true
+
+#now lets tackle a matirx with missing values
+
+m <- matrix(1:20,nrow=5)
+#contaminate it with Nas
+
+m[1,1] <- NA
+m[5,4] <- NA
+m[2,3] <- NA
+
+m[complete.cases(m),]
+
+m[complete.cases(m[,c(1,2)]),] # drops row 1
+
+#lets make a new matrix
+
+m <-  matrix(data = 1:12,nrow=3)
+
+#the first part will create the row labels, the second part will create the column labels
+dimnames(m) <- list(paste("Boyos",LETTERS[1:nrow(m)],sep = ""),paste("Site",1:ncol(m),sep = ""))
+print(m)
+
+#we can also subset the matrix based on the elements
+
+#behold!
+#grab row 1 and 2 and column 3 and 4
+m[1:2,3:4]
+#the equivalent would be
+m[c("BoyosA","BoyosB"),c("Site3","Site4")]
+
+m[1:2,]
+
+m[,3:4]
+
+#first try a logical that can be applied to all columns
+
+colSums(m)>15
+
+#returns a boolean statement for each column
+#but this will grab the data itself
+
+m[,colSums(m)>15]
+
+m[rowSums(m)==22,]
+
+#flip it and reverse it
+
+m[rowSums(m)!=22,]
+
+
+#e.g. choose all rows for which the numbers for site 1 are less than 3 AND choose all columns for which the numbers for species A are less than 5 (boyos)
+
+#first try this logical for rows
+
+m[,"Site1"]<3
+m[m[,"Site1"]<3,]
+
+m["BoyosA",]<5
+
+#add this in and select with all rows
+
+m[,m["BoyosA",]<5]
+
+m[m[,"Site1"]<3,m["BoyosA",]<5]
+
+##caution, simple subscripting to a vector changes the data type!
+
+z <- m[1,]
+print(z)
+str(z)
+
+z2 <- m[1, ,drop=FALSE]
+print(z)
+str(z)
+
+
+#we will bring in a dataset
+
+data <- read.csv(file = "antcountydata.csv",header = TRUE,sep = ",")
+ant <- data
+
+unique(data$state)
+
+library(ggplot2)
+
+theme_set(theme_bw(base_size = 16))
+
+ggplot(data = ant)+geom_bar(aes(state,n.species,fill=state),stat = 'identity')
+
+?geom_bar
