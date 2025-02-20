@@ -2,6 +2,8 @@
 # 11 February 2025
 # RMJ
 
+library(ggplot2)
+theme_set(theme_bw(base_size = 16))
 
 ################################ Working with functions like a bitch baby ######################
 
@@ -117,4 +119,133 @@ hardyweinberg2 <- function(p=runif(1)){
 
 hardyweinberg2(p=p)
 hardyweinberg2(p=-2)
+
+###################### 13 February Functions ###################
+
+#scoping in functions, variables that only exist in the function
+
+
+
+my_func <- function(a=3,b=4) {
+
+  #note that this also provided default values for a and b in the event that the user does not provide values
+  z <- a+b
+
+  return(z)
+
+}
+
+#note that a and b do not appear in the environment
+
+my_func() #output prints to screen
+
+#this is a bad function because it does not provide a default for b. It will source but it will not work
+
+my_func_bad <- function(a=3){
+  z <- a+b
+
+  return(z)
+
+}
+
+#so when we run it we get an error which we expect
+
+my_func_bad() #BUT if we make a global variable called b it should work
+
+b <- 100
+
+# try it again
+
+my_func_bad() #now it works!this is because when a function runs it will look inside and outside the function. but this is not good practice because it relies on outside variables
+
+#this one will work because the variables are created internally
+my_func_ok <- function(a=3){
+
+  bb <- 100
+  z <- a+bb
+  return(z)
+
+
+}
+
+my_func_ok() #zoot zoot, working function
+
+print(bb) #note that this doesn't work because bb exists only inside the function
+
+############################ Simple Functions ###################
+
+#################################
+
+#FUNCTION: Fit linear
+# fits simple regression line
+# inputs: numerical vector predictor (x) and response (y)
+# outputs: slipe and p-value
+
+#--------------------------------------------------
+fit_linear <- function(x=runif(100),y=runif(100)){
+  my_mod <- lm(y~x) # fit the model
+  my_out <- c(slope=summary(my_mod)$coefficients[2,1], p_value=summary(my_mod)$coefficients[2,4])
+
+  p1<- ggplot()+geom_point(aes(x=x,y=y,colour = "blue",alpha=.5,size = 2))
+  plot(x=x,y=y)
+
+  return(my_out)
+
+}
+
+#and run it
+fit_linear()
+
+###############################
+
+#increasing the complexity, this will make it so if the user does not put in a value it will take a default
+
+fit_linear2 <- function(p=NULL){
+  if(is.null(p)){
+    p <- list(x=runif(100),y=runif(100))
+  }
+
+  my_mod <- lm(p$y~p$x) # fit the model
+  my_out <- c(slope=summary(my_mod)$coefficients[2,1], p_value=summary(my_mod)$coefficients[2,4])
+
+  plot(x=p$x,y=p$y)
+
+  df <- data.frame(x=p$x,y=p$y)
+
+  return(my_out)
+
+  p1 <- ggplot(data = df,aes(x=x,y=y))+geom_point(aes(color="blue"),size = 2,alpha = .5)
+
+  return(p1)
+
+}
+
+fit_linear2()
+
+#now lets create some nondefault variables
+
+my_pars <- list(x=1:10,y=sort(runif(10)))
+
+#and run the fit linear 2 with those nondefault remember that p is the only input value we need
+
+fit_linear2(p=my_pars)
+
+####################### do calls
+
+
+z <- c(runif(99),NA)
+mean(z) # this doesn't return an error just an NA so we don't know that th e cause is one NA
+
+#but we can run without NAs
+mean(x=z, na.rm = TRUE) #handy
+
+#there is also the trim function which will cut off the extreme ends of the value by a percentile i.e. .01 means the 1 percentile
+
+mean(x=z,na.rm = TRUE,trim = 0.05)
+
+l <- list(x=z,na.rm=TRUE,trim=0.05) #this will bundle the parameters as a list
+
+do.call(mean,l) # the function do.call has two inputs, the name of the function and a list containing the values for all the parameters
+
+
 

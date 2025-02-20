@@ -1,0 +1,398 @@
+---
+title: "Homework_6"
+author: "RMJ"
+date: "2025-02-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Code Outline
+
+Step 1: generate a fake dataset using your chosen dataset as a model
+Step 2: generate relevant summary statistics
+Step 3: conduct a statistical test-regression anova
+Step 4: plot your data
+Step 5: use for loops to rerun your analysis but with changed parameters or sample sizes
+Step 6: store results from each loop and include a write-up
+
+
+### Dataset Description
+
+For this assignment the chosen dataset will be one of video games released between 1980-2023. it includes the name of the game, the North American release date, the team, the rating, the gross numbner of reviews, the genre(s), the gross amount that i has been played, and the gross amount of current plays 
+
+### Dataset Metadata
+
+This dataset has the following liscense: Database Contents License (DbCL) v1.0
+
+Source: https://www.kaggle.com/datasets/arnabchaki/popular-video-games-1980-2023?resource=download
+
+### Hypothesis and Thoughts
+
+As a gamer myself I have some contextual observations that suggest that overtime there is less diversity of video game, that is to say the most popular games are all of the same or similar genre and that there are fewer genres released. 
+
+I'm also generally curious about a few relationships in the gamer data
+
+* is there a relation between the Team that made the game and the review?
+* is there a relation between the Team that made the game and the number of plays?
+* is there a correlation between the Review score and the number of plays?
+
+```{r}
+
+#bring in the libraries we need to run this ship
+
+library(tidyverse)
+library(ggplot2)
+library(MCMCglmm)
+
+#and also since we'll be using ggplot we can set the theme to be a better aesthetic
+
+theme_set(theme_bw(base_size = 16))
+
+
+```
+
+
+
+```{r}
+
+# first we will load up the dataset 
+
+df <- read.csv(file = "../Datasets/games_edit.csv",header = TRUE,sep = ",")
+
+#and check its general dimensions
+
+dim(df)
+
+#nice 1495 entries with 10 variables, lets take a peek
+
+head(df)
+
+#and get a summary
+
+summary(df)
+
+
+```
+
+```{r}
+
+#we can do some quick summary statistics to see the spread of data
+
+#we can check how many video games were released by year
+hist(df$Release_year,breaks = 43)
+
+#and the number of plays
+
+hist(df$Plays_K)
+
+#and the number of playing
+
+hist(df$Playing_K)
+
+
+```
+``` {r}
+
+#our data has a large time component, we can use this to track trends overtime
+
+#lets see how the ratings change overtime as an example
+
+ggplot(data = df,aes(x=Release_year,y=Rating,group = Release_year))+geom_boxplot()
+
+ggplot(data = df,aes(x=Release_year,y=Rating,group = Release_year,colour = Rating))+geom_point()+scale_color_viridis_c()
+
+var(df$Rating)
+
+```
+
+Interesting! The bulk of the ratings across the years are above 3! There are of course some outliers, some true bombers, but the data are definitely skewed towards higher ratings. It does look like there might be a minor trend towards increasing negative reviews as years go on. we can check with ANOVA to see if there is any significance
+
+```{r}
+
+
+res_aov <- aov(Rating ~ Release_year,
+  data = df
+)
+
+summary(res_aov)
+
+
+```
+This suhggests that no, there is no statistical significance between the year and the rating. 
+
+Ok lets dive a bit more into out hypotheses. We want to know first if there is a lack of diversity in game genres across time
+
+```{r}
+
+# we will start by getting a general sense of the genres out there 
+
+ggplot(data = df, aes(x = Genres)) +
+    geom_bar()
+
+```
+
+Ah, as this shows because the genres are so mixed, there are a lot of them. 250 to be exact. lets filter the data a bit but first lets actually see how many unique genres there are each year
+
+```{r}
+
+#group the data and count the genres by year
+
+df.e <- df
+
+df.e$count <- 1
+
+df.g.year <- df.e %>%
+  group_by(Release_year,Genres) %>% 
+  summarise(unique_types = sum(count))
+
+#and plot the counts
+
+ggplot(data = df.g.year,aes(x=Release_year,y=unique_types))+geom_bar(stat = 'identity')
+
+#first out of curiousity 
+#lets create a list of the most popular genres 
+pop <- unique(df$Genres)[(table(df$Genres)>10)]
+
+```
+
+This data suggests that our hypothesis about the diversity of video game genres decreasing overtime seems to be at least partially incorrect! We see a clear trend upwards in the number of unique genres> not ethat 2023 should not be counted because at the time this data was acquired 2023 was not complete. So from 1980-2022 we see a noticable increase in video game genre diversity. But is there significance?
+
+
+```{r}
+
+res_aov <- aov(unique_types ~ Release_year,
+  data = df.g.year
+)
+
+summary(res_aov)
+
+```
+and we have significance!! 
+
+### Relationship analysis
+
+we have a few questions about relations which we can analyze through a general correlation analysis
+
+* is there a relationship between the Team that made the game and the review score?
+* is there a relationship between the Team that made the game and the number of plays?
+* is there a correlation between the Review score and the number of plays?
+
+```{r}
+
+#lets check how many teams there are
+
+numteam <- table(df$Team)
+
+#ok that is way too many lets think of a way to shrink them down. how about by popularity
+
+df.g.team <- df.e %>%
+  group_by(Team) %>% 
+  summarise(t.plays = sum(Plays_K))
+
+hist(df.g.team$t.plays)
+
+#thats still too many, maybe if we use the number of games made instead
+
+df.g.team <- df.e %>%
+  group_by(Team) %>% 
+  summarise(game.counts = sum(count))
+
+hist(df.g.team$game.counts)
+
+#much more reasonable. we can filter out teams that only have made 5 or more games
+
+hiT <- unique(df.g.team$Team)[(df.g.team$game.counts>=5)]
+
+df.teams <- filter(df, Team %in% hiT)
+
+ggplot(data = df.teams,aes(x=Team,y=Rating,group = Team) )+geom_boxplot()+geom_point(aes(colour = Rating))+scale_color_viridis_c()
+
+
+```
+unfortunately the team names are too long to effectively display so we won''t rotate them, but the spread does show that each team may have a spread of review scores i.e. most teams do not only make highly reviewed games. an interesting observation too is that it appears as though the more games that a team makes, the greater the spread of ratings (though not always)
+
+```{r}
+res_aov <- aov( Rating ~ Team,
+  data = df.teams
+)
+
+summary(res_aov)
+
+```
+
+This is mostly just to verify that YES the team does matter in regards to the rating. 
+
+```{r}
+
+ggplot(data = df.teams,aes(x=Team,y=Plays_K,group = Team) )+geom_boxplot()+geom_point(aes(colour = Plays_K))+scale_color_viridis_c()
+
+
+```
+
+And this shows another big spread of data where each team had a wide array of number of plays
+
+```{r}
+
+res_aov <- aov( Plays_K ~ Team,
+  data = df.teams
+)
+
+summary(res_aov)
+
+
+```
+
+And this is also significant 
+
+Lastly because the both the variables are numeric we can do a  proper correlation analysis between the reviews and the number of plays
+
+```{r}
+
+cor(df$Rating, df$Plays_K,
+  method = "spearman"
+)
+
+```
+Interesting! So this suggests a fairly weak correlation between the rating and the number of plays which isn't what I expected. Lets vizualize
+```{r}
+
+ggplot(data = df,aes(x=Rating,y=Plays_K))+geom_jitter(aes(colour = Plays_K))+scale_color_viridis_c()
+
+
+```
+And this supports what we are seeing in the correlation analysis. There is a general trend upwards however, the data are skewed to a high rating with a relatively low play. 
+
+We can also check to see if there is a relationship between the rating and the number of reviews as well as the number of reviews and the number of plays
+
+```{r}
+
+#plot the rating vs the number of reviews 
+
+ggplot(data = df,aes(x=Rating,y=Number.of.Reviews))+geom_jitter(aes(colour = Number.of.Reviews))+scale_color_viridis_c()
+
+res_aov <- aov( Number.of.Reviews ~ Rating,
+  data = df)
+
+summary(res_aov)
+
+
+#and plot the number of reviews vs the number of plays
+
+ggplot(data = df,aes(x=Number.of.Reviews,y=Plays_K))+geom_jitter(aes(colour = Plays_K))+geom_smooth()+scale_color_viridis_c()
+
+res_aov <- aov( Number.of.Reviews ~ Plays_K,
+  data = df)
+
+summary(res_aov)
+
+```
+There does appear to be a trend that the more reviews there are the more plays there typically are as well, however we cannot ignore the bulking of the data which are concentrated in the <1000 reviews and <10000 plays area.
+
+it is also worth noting that the number of reviews is typically much smaller than the number of plays (which doesn't equate to the number of players necessarily) but this suggests that the number of reviews is a small subset of the total possible reviewers
+
+```{r}
+
+df <- df %>% mutate(play.to.review=(Number.of.Reviews/Plays_K))
+
+hist(df$play.to.review)
+
+
+```
+
+
+### finding normal review structure
+
+
+From our observations we can see that the reviews skew to the right towards 5 i.e. people who do rate disproportionately rate high. As an analysis lets see what a normal distribution of different sample sizes up to the total number of reviews would be based on the mean rating that we observe
+
+```{r}
+#first we will look at our distribution
+
+hist(df$Rating,breaks=20,xlim = c(1,5))
+
+#get the average rating and variance
+
+mean.rating <- mean(df$Rating)
+var.rating <- var(df$Rating)
+
+#and the total number of reviews
+
+sum.rev <- sum(df$Number.of.Reviews)
+
+hist(rtnorm(sum.rev,mean=mean.rating,lower=1,upper=5),col="gray")
+
+#This isn't a true representation though as the rating in this dataset is an amalgamation of the number of reviews, the average of an average. let's instead create a for loop to see how this changes as change the number of possible reviews 
+
+z <- c(100,1000,1500,5000,10000,50000,10000)
+
+for(i in 1:length(z)){
+  set.seed(666)
+  
+  hist(rtnorm(z[i],mean=mean.rating,lower=1,upper=5),col="gray")
+  
+  cat("the mean of the data is=", mean(rtnorm(z[i],mean=mean.rating,lower=1,upper=5)),"\n")
+}
+
+```
+
+As we can see from the output, with our mean if the data were normal we would expect that between 3.75-4 would be our most frequent bin, which is less than our actual data.
+
+As a last analysis lets see how the mean review changes when we sample randomly and increase the random sample size (of our actual data)
+
+```{r}
+
+z <- c(5,10,20,50,100,200,500,1000)
+
+for(i in 1:length(z)){
+  set.seed(666)
+  
+  df.ran <- sample_n(df,z[i])
+  
+  mm <- mean(df.ran$Rating)
+  vv <- var(df.ran$Rating)
+  
+  n <- runif(z[i],min = 1,max = 5)
+  
+  mm.n <- mean(n)
+  vv.n <- var(n)
+  
+  cat("at a sample size of",z[i], "the mean rating is", mm, "and the variance is", vv,"the normal mean is",mm.n,"and the normal variance is", vv.n,"\n")
+  
+}
+
+
+```
+As we can see, regardless of the sample size the mean stays the same but the variance increases and plateaus. The empirical mean is greater than the normal mean again suggesting the skew of the data. 
+
+
+### Summary
+
+In this analysis we examined a few aspects of our gaming dataset that will be summarized here.
+
+Hypothesis: There is a decrease in video game genres (less video game diversity) over time. verdict: FALSE
+
+We found that in fact the number of video game genres increases over time. This may owe to the fact that video games are classified more liberally as time goes on (i.e. they are genre inclusive) but regardless, the types of video games from a mixed genre perspective was shown to increase.
+
+Hypothesis: There is a relationship between the Team and the rating of the game. verdict: TRUE
+
+While the data are highly variable in the amount of games attributed to each team we observed that there was statistical significance between the team and the rating implying that the ratings are not necessarily random. This does not directly convey whether certain teams only produce games of a certain rating more that the two variables are not independent. 
+
+Hypothesis: There is a correlation between the rating and the number of plays. verdict: FALSE
+
+There is a weak correlation between the two variables which might be explained by the clustering of the data in that most data fall into the category of having few plays but a high rating
+
+Hypothesis: There is a relationship between the number of plays and the number of reviews. Verdict: TRUE
+
+There is a distinct positive trend that shows that games with more plays typically have more reviews. However, as with the previous hypothesis there is a skew in the data to games that have both a low number of plays and a low number of reviews. 
+
+Hypothesis: The distribution of reviews is not normal and skews higher. Verdict: TRUE
+
+In compared to a normal distribution with the same mean we see that our data skews towards a overall higher review score. When randomly sampled the mean remained high as opposed to representing a more normal spread that would trend towrds the middle. 
+
+Conclusions: This dataset was an interesting exploration into how the ratings of video games relate to the number of plays and teams. We saw that ratings of video games tend to skew higher and away from the possible average and there is a large variability in play. 
+
+
+
