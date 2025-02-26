@@ -133,6 +133,10 @@ iris6 <- iris4 %>% group_by(Species) %>%  summarize(avg.Sepal.Length=mean(Sepal.
 
 # I was using pipes from the get go! They're so handy!
 
+# but I am a heathen and don't believe in using the new line. one. big. line. 
+
+irisFinal <- ir %>% filter(Species %in% c("virginica","versicolor") & Sepal.Length > 6 & Sepal.Width > 2.5) %>% select(Species, Sepal.Length, Sepal.Width) %>% arrange(desc(Sepal.Length))%>% mutate(Sepal.Area=(Sepal.Length * Sepal.Width))%>% group_by(Species) %>%  summarize(avg.Sepal.Length=mean(Sepal.Length), avg.Sepal.Width=mean(Sepal.Width),sd.Sepal.Length=sd(Sepal.Length), sd.Sepal.Width=sd(Sepal.Width),var.Sepal.Length=var(Sepal.Length), var.Sepal.Width=var(Sepal.Width),obs.count=n())
+
 ```
 
 9. Create a ‘longer’ data frame using the original iris data set with three columns named “Species”, “Measure”, “Value”. The column “Species” will retain the species names of the data set. The column “Measure” will include whether the value corresponds to Sepal.Length, Sepal.Width, Petal.Length, or Petal.Width and the column “Value” will include the numerical values of those measurements.

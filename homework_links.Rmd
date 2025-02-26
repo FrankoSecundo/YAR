@@ -34,4 +34,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 [Week 6 Homework Html](Homework/Homework_6.html)
 
+### Homework 7
+
+[Week 7 Homework Markdown](Homework/Homework_7.Rmd)
+
+[Week 7 Homework Html](Homework/Homework_7.html)
+
 
