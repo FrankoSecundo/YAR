@@ -1,0 +1,154 @@
+---
+title: "Homework_7"
+author: "RMJ"
+date: "2025-02-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### Data Manipulations using the dplyr package
+
+
+We are going to be working with the iris dataset (classic) and using dplyr TO BEND THE DATASET TO OUR WILL AND REFORGE IT IN OUR IMAGE
+
+```{r}
+
+## first things first load up the libraries
+
+library(tidyverse)
+
+# and bring in the dataset
+
+data(iris)
+
+#shorten it to make a copy and also to make it easier to type
+
+ir <- iris
+
+```
+
+1. Examine the structure of the iris data set. How many observations and variables are in the data set?
+
+```{r}
+
+
+dim(ir)
+
+#looks like 150 observations and 5 variables 
+
+
+```
+2. Create a new data frame iris1 that contains only the species virginica and versicolor with sepal lengths longer than 6 cm and sepal widths longer than 2.5 cm. How many observations and variables are in the data set?
+
+``` {r}
+
+iris1 <- ir %>% filter(Species %in% c("virginica","versicolor") & Sepal.Length > 6 & Sepal.Width > 2.5)
+
+#check the structure
+
+dim(iris1)
+
+#looks like we got a 56 5, 56 observations and 5 variables pawtner
+
+
+```
+
+3. Now, create a iris2 data frame from iris1 that contains only the columns for Species, Sepal.Length, and Sepal.Width. How many observations and variables are in the data set?
+
+```{r}
+
+iris2 <- select(iris1, Species, Sepal.Length, Sepal.Width)
+
+# check the dims
+
+dim(iris2)
+
+#we knocked out two columns so it makes sense that we have 56 observations still but only 3 variables
+
+```
+
+4. Create an iris3 data frame from iris2 that orders the observations from largest to smallest sepal length. Show the first 6 rows of this data set.
+
+``` {r}
+
+iris3 <- arrange(iris2,desc(Sepal.Length))
+
+# check the first six rows
+
+head(iris3)
+
+```
+
+5. Create an iris4 data frame from iris3 that creates a column with a sepal area (length * width) value for each observation. How many observations and variables are in the data set?
+
+```{r}
+
+# somebody call prof. x because we're about to make a mutant!
+
+iris4 <- iris3 %>% mutate(Sepal.Area=(Sepal.Length * Sepal.Width))
+
+dim(iris4)
+
+#with mutate we added an additional column but did not change the original number of observations thus we have 56 observations and 4 variables (one with that new variable smell)
+
+
+```
+
+6. Create iris5 that calculates the average sepal length, the average sepal width, and the sample size of the entire iris4 data frame and print iris5.
+
+``` {r}
+
+# whats that smell? It smells like SUMMARIZE TIME!!
+
+# we will summarize to get the means and while we're here let's do the other stats too. Why not? Whose going to stop me? I fear neither god nor man. 
+
+iris5 <- iris4 %>% summarize(avg.Sepal.Length=mean(Sepal.Length), avg.Sepal.Width=mean(Sepal.Width),sd.Sepal.Length=sd(Sepal.Length), sd.Sepal.Width=sd(Sepal.Width),var.Sepal.Length=var(Sepal.Length), var.Sepal.Width=var(Sepal.Width),obs.count=n())
+
+print(iris5)
+
+
+```
+
+7. Finally, create iris6 that calculates the average sepal length, the average sepal width, and the sample size for each species of in the iris4 data frame and print iris6.
+
+```{r}
+
+# here we are once again, we're summarizing, can't deny it, can't pretend. we're doing it by species this time!
+
+# why do one stat when three will do!? we'll also do the variance and standard deviation. FOR COMPLETENESS!
+
+iris6 <- iris4 %>% group_by(Species) %>%  summarize(avg.Sepal.Length=mean(Sepal.Length), avg.Sepal.Width=mean(Sepal.Width),sd.Sepal.Length=sd(Sepal.Length), sd.Sepal.Width=sd(Sepal.Width),var.Sepal.Length=var(Sepal.Length), var.Sepal.Width=var(Sepal.Width),obs.count=n())
+
+# interesting, our dataset is a pretty virginica heavy, that must have something to do with our selection criteria. 
+
+```
+
+8. In these exercises, you have successively modified different versions of the data frame iris1 iris2 iris3 iris4 iris5 iris6. At each stage, the output data frame from one operation serves as the input fro the next. A more efficient way to do this is to use the pipe operator %>% from the tidyr package. See if you can rework all of your previous statements (except for iris5) into an extended piping operation that uses iris as the input and generates irisFinal as the output.
+
+```{r}
+
+# I was using pipes from the get go! They're so handy!
+
+```
+
+9. Create a ‘longer’ data frame using the original iris data set with three columns named “Species”, “Measure”, “Value”. The column “Species” will retain the species names of the data set. The column “Measure” will include whether the value corresponds to Sepal.Length, Sepal.Width, Petal.Length, or Petal.Width and the column “Value” will include the numerical values of those measurements.
+
+```{r}
+
+ir.long <- ir %>% pivot_longer(cols = Sepal.Length:Petal.Width,names_to = "Measure",values_to = "Value")
+
+```
+
+What's that you say? you want to see a graph of the data? Well since you asked so nicely!
+
+```{r}
+
+theme_set(theme_bw())
+
+ggplot(data = ir.long,aes(x = Species,y=Value,fill=Measure))+geom_bar(stat = 'identity',position = 'dodge')+scale_fill_manual(values = c("#219ebc","#023047","#ffb703","#fb8500"))
+
+```
