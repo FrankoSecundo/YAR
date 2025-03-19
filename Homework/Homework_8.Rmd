@@ -1,0 +1,286 @@
+---
+title: "Homework_8"
+author: "RMJ"
+date: "2025-03-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Running the example data
+
+For this first part we will mostly be doing an example workflow 
+```{r}
+
+# first load libraries
+
+library(ggplot2)
+library(MASS)
+library(tidyverse)
+
+theme_set(theme_bw(base_size = 16))
+
+
+```
+
+bring in our data vector
+
+```{r}
+# from what I gather we are making an object z which is composed of 3000 random numbers
+
+z <- rnorm(n=3000,mean=0.2)
+z <- data.frame(1:3000,z)
+names(z) <- list("ID","myVar")
+z <- z[z$myVar>0,]
+str(z)
+summary(z$myVar)
+
+```
+
+for distributions the best thing we can do is visualize it. we'll do that with a general histogram but lets make it cute
+
+```{r}
+
+# the original color was cornsilk we will not be doing that because it is ugly. 
+
+p1 <- ggplot(data=z, aes(x=myVar, y=..density..)) +
+  geom_histogram(color="black",fill="orchid",size=0.2) 
+print(p1)
+
+# now that's a hot graph!
+
+# now we can add a density curve so we can see the distribution
+
+p1 <-  p1 +  geom_density(linetype="dotted",size=0.75)
+print(p1)
+```
+
+so we have the shape of our distribution now we can move on to getting the maximum likelihood parameters of the normal
+
+```{r}
+normPars <- fitdistr(z$myVar,"normal")
+print(normPars)
+str(normPars)
+normPars$estimate["mean"] # note structure of getting a named attribute
+
+
+```
+ Now we can overlay what is a normal probability density with our data
+ 
+```{r}
+
+meanML <- normPars$estimate["mean"]
+sdML <- normPars$estimate["sd"]
+
+xval <- seq(0,max(z$myVar),len=length(z$myVar))
+
+ stat <- stat_function(aes(x = xval, y = ..y..), fun = dnorm, colour="Dark Cyan", n = length(z$myVar), args = list(mean = meanML, sd = sdML))
+ p1 + stat
+```
+looks like we got a bit of a skew!
+
+We'll run through each distribution to see how it fits 
+
+Exponential
+
+```{r}
+
+expoPars <- fitdistr(z$myVar,"exponential")
+rateML <- expoPars$estimate["rate"]
+
+stat2 <- stat_function(aes(x = xval, y = ..y..), fun = dexp, colour="gold", n = length(z$myVar), args = list(rate=rateML))
+ p1 + stat + stat2
+
+```
+Uniform
+
+```{r}
+stat3 <- stat_function(aes(x = xval, y = ..y..), fun = dunif, colour="darkgreen", n = length(z$myVar), args = list(min=min(z$myVar), max=max(z$myVar)))
+ p1 + stat + stat2 + stat3
+
+```
+uniform definitely ain't it
+
+Gamma
+
+```{r}
+
+gammaPars <- fitdistr(z$myVar,"gamma")
+shapeML <- gammaPars$estimate["shape"]
+rateML <- gammaPars$estimate["rate"]
+
+stat4 <- stat_function(aes(x = xval, y = ..y..), fun = dgamma, colour="Tomato", n = length(z$myVar), args = list(shape=shapeML, rate=rateML))
+ p1 + stat + stat2 + stat3 + stat4
+
+```
+
+Beta
+
+```{r}
+
+pSpecial <- ggplot(data=z, aes(x=myVar/(max(myVar + 0.1)), y=..density..)) +
+  geom_histogram(color="grey60",fill="dodgerblue",size=0.2) + 
+  xlim(c(0,1)) +
+  geom_density(size=0.75,linetype="dotted")
+
+betaPars <- fitdistr(x=z$myVar/max(z$myVar + 0.1),start=list(shape1=1,shape2=2),"beta")
+shape1ML <- betaPars$estimate["shape1"]
+shape2ML <- betaPars$estimate["shape2"]
+
+statSpecial <- stat_function(aes(x = xval, y = ..y..), fun = dbeta, colour="orchid", n = length(z$myVar), args = list(shape1=shape1ML,shape2=shape2ML))
+pSpecial + statSpecial
+```
+
+
+## Using real data!
+
+The dataset that I will be using will be the physical characteristics of the first 8 generations of pokemon. We have height and weight data for 905 pokemon but we'll just use the height
+
+```{r}
+
+#we'll load up the dataset
+
+z <- read.table(file = "../Datasets/archive/pokemon_data_pokeapi.csv",header=TRUE,sep=",")
+str(z)
+summary(z)
+
+# as cool as it is we really only need the numerical columns so we'll select those 
+
+z <- z %>% select(Name,Pokedex.Number,Height..m.,Weight..kg.)
+
+#we'll change the names so that the height is the myvar so we can run it
+
+colnames(z) <- c("Name","dex.entry","myVar","weight")
+
+
+summary(z$myVar)
+
+
+```
+
+From here we'll run through the code the same way as before but with real data....well real data about fictional creatures. 
+
+```{r}
+
+p1 <- ggplot(data=z, aes(x=myVar, y=..density..)) +
+  geom_histogram(color="black",fill="orchid",size=0.2) 
+print(p1)
+
+p1 <-  p1 +  geom_density(linetype="dotted",size=0.75)
+print(p1)
+
+```
+
+oooooo dang that is one hell of a skew. so keep in mind that myVar is the height in meters so this is skewed hard to the left and cannot be negative
+
+
+
+```{r}
+normPars <- fitdistr(z$myVar,"normal")
+print(normPars)
+str(normPars)
+normPars$estimate["mean"] # note structure of getting a named attribute
+
+
+```
+lets proceed going through each of the distributions
+
+### Normal
+ 
+```{r}
+
+meanML <- normPars$estimate["mean"]
+sdML <- normPars$estimate["sd"]
+
+xval <- seq(0,max(z$myVar),len=length(z$myVar))
+
+ stat <- stat_function(aes(x = xval, y = ..y..), fun = dnorm, colour="Dark Cyan", n = length(z$myVar), args = list(mean = meanML, sd = sdML))
+ p1 + stat
+```
+
+### Exponential
+
+```{r}
+
+expoPars <- fitdistr(z$myVar,"exponential")
+rateML <- expoPars$estimate["rate"]
+
+stat2 <- stat_function(aes(x = xval, y = ..y..), fun = dexp, colour="gold", n = length(z$myVar), args = list(rate=rateML))
+ p1 + stat + stat2
+
+```
+### Uniform
+
+```{r}
+stat3 <- stat_function(aes(x = xval, y = ..y..), fun = dunif, colour="darkgreen", n = length(z$myVar), args = list(min=min(z$myVar), max=max(z$myVar)))
+ p1 + stat + stat2 + stat3
+
+```
+
+
+### Gamma
+
+```{r}
+
+gammaPars <- fitdistr(z$myVar,"gamma")
+shapeML <- gammaPars$estimate["shape"]
+rateML <- gammaPars$estimate["rate"]
+
+stat4 <- stat_function(aes(x = xval, y = ..y..), fun = dgamma, colour="Tomato", n = length(z$myVar), args = list(shape=shapeML, rate=rateML))
+ p1 + stat + stat2 + stat3 + stat4
+
+```
+Beta
+
+```{r}
+
+pSpecial <- ggplot(data=z, aes(x=myVar/(max(myVar + 0.1)), y=..density..)) +
+  geom_histogram(color="grey60",fill="dodgerblue",size=0.2) + 
+  xlim(c(0,1)) +
+  geom_density(size=0.75,linetype="dotted")
+
+betaPars <- fitdistr(x=z$myVar/max(z$myVar + 0.1),start=list(shape1=1,shape2=2),"beta")
+shape1ML <- betaPars$estimate["shape1"]
+shape2ML <- betaPars$estimate["shape2"]
+
+statSpecial <- stat_function(aes(x = xval, y = ..y..), fun = dbeta, colour="orchid", n = length(z$myVar), args = list(shape1=shape1ML,shape2=shape2ML))
+pSpecial + statSpecial
+```
+
+### Analysis and Discussion
+
+As a general overview of the data the shape is that of a left skew with a long right tail meaning that the data are dense on the left with low numbers of higher values. Contextually this means that the majority of pokemon are in the same height range (0-3) meters while >5 meters is represented by individuals or small amounts of pokemon. This is probably pretty close to real world depictions of animals within the same species (I suppose technically pokemon are all the same species since they can interbreed somehow....) where the majority is centered around a mean size with large members being sparsely represented. 
+Looking at the different distributions the gamma and beta distributions seem to fit the best. I would go as far to say that the gamma distribution fits the most accurately although the beta is very close. While exponential captures the tail very well it greatly overestimates the low end and the normal distribution underestimates the mean values. As we would expect, the uniform is flatout wrong but it would be inappropriate to use in this context because the probability of a pokemon height is not equal from pokemon to pokemon. 
+
+Lastly we'll create a mock dataset with the same mean and length and see what that looks like
+
+```{r}
+normPars <- fitdistr(z$myVar,"gamma")
+print(normPars)
+str(normPars)
+normPars$estimate["mean"] # note structure of getting a named attribute
+
+y <- rnorm(n=905,mean=1.193)
+y <- data.frame(1:905,y)
+names(y) <- list("ID","myVar")
+y <- y[y$myVar>0,]
+str(y)
+summary(y$myVar)
+
+p2 <- ggplot(data=y, aes(x=myVar, y=..density..)) +
+  geom_histogram(color="black",fill="orchid",size=0.2) 
+print(p2)
+
+p2 <-  p2 +  geom_density(linetype="dotted",size=0.75)
+print(p2)
+
+
+```
+
+completely different! This one actually looks like a normal distribution though it does have a small amount of tail on the right, it doesn't capture the reality that the tail extends to a large number
+
+
+
+
