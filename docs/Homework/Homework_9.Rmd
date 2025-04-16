@@ -1,0 +1,70 @@
+---
+title: "Homework_9"
+author: "RMJ"
+date: "2025-03-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This homework we will be coding with the strategic coding tools! 
+
+Let's bring in dem libraries first mon
+
+```{r}
+
+library(pracma)
+library(pryr)
+library(upscaler)
+library(tidyverse)
+library(stringr)
+
+```
+
+```{r}
+# and using the upscaler package we will create a folder
+
+add_folder()
+```
+
+```{r}
+# I put the data into the originalData folder for access but within that we only essentially want one file which is the count data. we will pull out the file names for each
+
+c.file.l <- ""
+
+nam <- list.files("OriginalData/NEON_count-landbird/")
+
+for(i in nam){
+  
+  fn <- paste("OriginalData/NEON_count-landbird/",i,"/",sep = "")
+  
+  c.file <- list.files(fn,pattern = "*count",full.names = TRUE)
+  
+  c.file.l <- c(c.file.l,c.file)
+  
+
+  
+}
+
+c.file.l <- c.file.l[2:11]
+
+print(c.file.l)
+
+```
+
+```{r}
+
+# Now that we have the file names we can make some pseudo code that will describe the order of operations for what we are going to do!
+
+build_function(c("clean_data","extract_year","calculate_abundance","calculate_richness","run_regression","generate_histograms"))
+
+```
+
+```{r}
+
+
+
+```
+

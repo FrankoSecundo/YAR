@@ -1,0 +1,18 @@
+uid,laboratoryName,date,domainID,siteID,technicianID,observerInstitutionName,evaluationMethod,evaluationScore,remarks
+"25fd4650-3884-4962-82c5-62050cad2c56","Bird Conservancy of the Rockies","2015-01-01","D01","BART","JRUEB","Massachusetts Audubon Society",,,"missing siteID inferred from brd_perpoint"
+"f87a1695-11f0-42cb-aa1d-a6e4b7a97848","Bird Conservancy of the Rockies","2016-06-01","D01","BART","JRITT","Massachusetts Audubon Society","startSeasonBirdQuiz",93,"missing siteID inferred from brd_perpoint"
+"6551c306-2fa6-4184-89a1-76dc8d10f24a","Bird Conservancy of the Rockies","2017-07-27","D01","BART","JRUEB","Massachusetts Audubon Society","endSeasonBirdQuiz",96,"missing siteID inferred from brd_perpoint"
+"ba8b4afc-3372-4a2d-b588-4acf342f3f6f","Bird Conservancy of the Rockies","2018-04-18","D01","BART","JRUEB","Massachusetts Audubon Society","protocolQuiz",95,
+"3c356d3e-56b3-4a51-9fd6-c5c78bf73501","Bird Conservancy of the Rockies","2018-04-18","D01","BART","JRUEB","Massachusetts Audubon Society","startSeasonBirdQuiz",100,
+"1b90fd93-c7ae-4d7d-993b-68c673580cd8","Bird Conservancy of the Rockies","2019-05-28","D01","BART","WFREE","Massachusetts Audubon Society","protocolQuiz",96,
+"e33ffb29-e0f3-4329-9a72-c305ffacaf63","Bird Conservancy of the Rockies","2019-05-28","D01","BART","WFREE","Massachusetts Audubon Society","startSeasonBirdQuiz",92,
+"2269930d-9694-485f-822e-0af684f5c0c5","Bird Conservancy of the Rockies","2020-05-20","D01","BART","WFREE","Massachusetts Audubon Society","protocolQuiz",89,
+"6535244a-dd7c-42f6-abdc-57623688c87e","Bird Conservancy of the Rockies","2020-05-20","D01","BART","WFREE","Massachusetts Audubon Society","startSeasonBirdQuiz",96,
+"8808f640-8305-4a80-97d5-133f49ce996e","Bird Conservancy of the Rockies","2021-05-25","D01","BART","JGLAG","Massachusetts Audubon Society","startSeasonBirdQuiz",98,
+"7d85ed22-570f-4d84-aae6-d15f5cff1136","Bird Conservancy of the Rockies","2021-05-25","D01","BART","JGLAG","Massachusetts Audubon Society","protocolQuiz",97,
+"69a9e412-ce56-4892-92ef-035fcb48a0c7","Bird Conservancy of the Rockies","2022-06-01","D01","BART","KKLAP","Massachusetts Audubon Society","protocolQuiz",95,
+"dc870ca2-55ca-46f1-8312-ad46280a9431","Bird Conservancy of the Rockies","2022-06-01","D01","BART","KKLAP","Massachusetts Audubon Society","startSeasonBirdQuiz",92,
+"fec8ad9b-48ce-4c96-8bb8-146bbef95071","Bird Conservancy of the Rockies","2023-05-31","D01","BART","KKLAP","Massachusetts Audubon Society","protocolQuiz",93,
+"801b56c1-e80e-4723-bc42-691bd1053c7c","Bird Conservancy of the Rockies","2023-05-31","D01","BART","KKLAP","Massachusetts Audubon Society","startSeasonBirdQuiz",93,
+"65376d85-8a92-4e68-914b-4039d7387176","Bird Conservancy of the Rockies","2024-06-02","D01","BART","KKLAP","Massachusetts Audubon Society","protocolQuiz",100,
+"45c2c9d6-e5ba-44df-8d05-aeed439a588a","Bird Conservancy of the Rockies","2024-06-02","D01","BART","KKLAP","Massachusetts Audubon Society","startSeasonBirdQuiz",90,

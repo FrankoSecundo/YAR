@@ -1,0 +1,226 @@
+---
+title: "Homework_10"
+author: "RMJ"
+date: "2025-04-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+keeping with the themes of my previous data projects when I was left to my own devices, we are going to look at the pokemon datasets and uncover trends and biases!
+
+```{r}
+# first as always let's bring in the libraries
+library(tidyverse)
+library(ggplot2)
+library(ggbeeswarm)
+library(ggridges)
+library(waffle)
+library(tidytuesdayR)
+library(reshape2)
+library(plot3D)
+library(plotly)
+
+# and set the theme
+
+theme_set(theme_bw(base_size = 17))
+
+```
+
+```{r}
+# now we will bring in the dataset itself which we will be getting from the tidy Tuesday website
+
+# use the tidytuesday function
+
+tuesdata <- tidytuesdayR::tt_load('2025-04-01')
+
+# and this will pull out as a dataframe
+
+pokemon_df <- tuesdata$pokemon_df
+
+# shorten it for fun
+
+pdf <- pokemon_df
+
+# and let's take a lil peek 
+
+head(pdf)
+
+# and find out the variables we have
+
+colnames(pdf)
+
+```
+
+From here on we'll run through a couple of visualizations that will help us see the diversity of pokemon and maybe even some interesting trends
+
+```{r}
+# I made a color palette set from the official type symbols. let's bring that in!
+
+pokepal <- read.csv(file = "../pokemon_col_palette.csv",header = TRUE)
+
+pokepal <- pokepal %>% arrange(Type)
+
+col <- unique(pokepal$Colorhex)
+
+# and a palette for the OG types
+
+pokepal2 <- read.csv(file = "../pokemon_col_palette_OG.csv",header = TRUE)
+
+pokepal2 <- pokepal2 %>% arrange(Type)
+
+col2 <- unique(pokepal2$Colorhex)
+
+
+
+```
+
+this won't count for the figures but lets get a quick histogram of the different pokemon types
+
+```{r}
+
+# type_1
+
+ggplot(data = pdf)+aes(x=type_1,fill = type_1)+geom_histogram(stat = "count")+scale_fill_manual(values = col)+theme(axis.text.x = element_blank())
+
+# type_2
+
+ggplot(data = pdf)+aes(x=type_2,fill = type_2)+geom_histogram(stat = "count")+scale_fill_manual(values = col)+theme(axis.text.x = element_blank())
+
+
+```
+
+Interesting, so we can see there are some clear favorites as far as types, the great majority are water types as their type 1 followed by normal. What is interesting is that there are very few that have flying as their primary type but it is the most common secondary type!
+
+Alrighty let's make some hot plots!
+
+First let's see how the density of types changes over generations!
+
+```{r}
+# first just to make things a little more even we are only going to work with the OG types which are
+
+# Normal, Fire, Water, Electric, Grass, Ice, Fighting, Poison, Ground, Flying, Psychic, Bug, Rock, Ghost, Dragon
+
+# and we are going to exclude flying since there are no pure flyers
+
+#make a list of the Original types
+
+OG <- c("normal","fire","water","electric","grass","ice","fighting","poison","ground","psychic","bug","rock","ghost","dragon")
+
+#and filter anything out that is not that type
+
+pdf.f <- pdf %>% filter(type_1 %in% OG)
+
+# And for the sake of this we'll only be using the type 1 data
+
+ggplot(data = pdf.f)+aes(x=generation_id,y=type_1,fill = type_1)+ggridges::geom_density_ridges(alpha=.3)+ggridges::theme_ridges()+scale_fill_manual(values = col2)+scale_x_continuous(breaks=seq(1,7, 1))
+
+
+```
+
+Cool stuff, now we swarm!!!
+
+```{r,fig.width=10,fig.height=11}
+
+#let's check attack stats
+
+ggplot(data = pdf.f)+aes(x=type_1,y=attack,color=type_1)+ggbeeswarm::geom_beeswarm(method = "center",size=2)+scale_color_manual(values = col2)
+
+# and defense
+
+ggplot(data = pdf.f)+aes(x=type_1,y=defense,color=type_1)+ggbeeswarm::geom_beeswarm(method = "center",size=2)+scale_color_manual(values = col2)
+
+# and hp because why not
+
+ggplot(data = pdf.f)+aes(x=type_1,y=hp,color=type_1)+ggbeeswarm::geom_beeswarm(method = "center",size=2)+scale_color_manual(values = col2)
+
+
+
+```
+So we see there is actually a pretty good spread of all the stats and its relatively equal for each of the types. 
+But this makes me wonder, is there a consistent sweet spot in regards to attack and defense? perhaps a 2D density plot will have the answer!
+
+
+```{r}
+
+ggplot(pdf, aes(x=attack, y=defense) ) +
+  geom_hex(bins = 25) +
+  scale_fill_continuous(type = "viridis") +
+  theme_bw()
+
+
+
+```
+Perhaps as expected, there seems to be a bit of a liner relationshipin the preference of ratios in that the majority are around balanced i.e. defense and attack are close to each other. This might be because the majority of pokemon are the first evolution and when they get strong (evolve) they become more specialized and attack or defense might become more dominant. 
+
+```{r}
+
+# let's put it into 3D with all the three primary stats
+x <- pdf$attack
+y <- pdf$defense
+z <- pdf$hp
+
+scatter3D(x, y, z, phi = 0, bty = "g",
+        pch = 20, cex = 2, ticktype = "detailed")
+
+plot_ly(pdf, x = ~attack, y = ~defense, z = ~hp, color = ~type_1)
+
+# nevermind thats pretty unuseful
+```
+
+
+```{r,fig.width=10,fig.height=11}
+
+### alright now for the question that we all want to know. numerically is there a better pokemon type? or if nothing else which type is best for which stat? For this we will turn to pie chart and look at the stats
+
+# first we will just
+
+#make a list of the new school types without flying. Sorry flying
+
+NS <- c("normal","fire","water","electric","grass","ice","fighting","poison","ground","psychic","bug","rock","ghost","dragon","dark","fairy","steel")
+
+#and filter anything out that is not that type
+
+pdf.ns <- pdf %>% filter(type_1 %in% NS)
+
+# now we want just the stat columns and the type
+
+pdf.nsf <- pdf.ns %>% select(id,type_1,hp,attack,defense,special_attack,special_defense,speed)
+
+#and we will melt it so it will work better in ggplot
+
+pdf.m <- melt(data = pdf.nsf,id=c("id","type_1"))
+
+# to the lab Kronk! IT'S TIME TO MUTATE!!!! 
+
+pdf.mg <- pdf.m %>% group_by(type_1,variable)
+
+pdf.mgs <- pdf.mg %>% summarise(mean_stat=mean(value))
+
+p <- pdf.mgs
+
+ggplot(p, aes(x=type_1,y=mean_stat,fill=variable)) + 
+          geom_bar(stat="identity",width=2) + 
+          coord_polar(theta='y')+facet_wrap(type_1~.,scales = "free")+scale_fill_manual(values = c("#264653","#2a9d8f","#8ab17d","#e9c46a","#f4a261","#e76f51"))
+
+# that's actually not quite helpful. As the criticism says, it is pretty hard to really judge the areas and compare them
+
+ggplot(p, aes(x=type_1,y=mean_stat,fill = variable))+geom_bar(position="fill", stat="identity")+coord_flip()+scale_fill_manual(values = c("#264653","#2a9d8f","#8ab17d","#e9c46a","#f4a261","#e76f51"))
+
+ggplot(p, aes(x=type_1,y=mean_stat,fill = variable))+geom_bar(position="stack", stat="identity")+coord_flip()+scale_fill_manual(values = c("#264653","#2a9d8f","#8ab17d","#e9c46a","#f4a261","#e76f51"))
+
+
+
+
+
+```
+
+AHA! I knew it! So when we break down the stats by percent they appear to be decently equal. However! When we stack them as is to add up to a total we see there are clear winners if we think of the total amount of points that can be alloted to each stat. Dragons, are the favored type in that regard in that overall more points are attributed to each of their stats. So statistically speaking if your team is entirely dragon type you on average have a higher base stat, which if you ask me is essentially cheating/choosing easy mode. Meanwhile if you want to have a challenge apparently you should have an all bug team. 
+
+
+
+
+
+
