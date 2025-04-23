@@ -11,7 +11,7 @@ calculate_abundance <- function(){
 
 setwd(dir = "CleanedData/")
 
-  list <- list.files(".")
+  list <- list.files(".",pattern = "\\d.csv$")
   pr <- read.csv(file = list[1],header = TRUE,sep = ",")
 
   df <- data.frame(matrix(nrow=0,ncol=length(pr)))
@@ -31,9 +31,20 @@ setwd(dir = "CleanedData/")
 
   combined.df <- combined.df %>% mutate(year=substring(startDate,1,4))
 
+  combined.df.clean <- combined.df[,c(14,16,27)]
+  combined.df.clean$count <- paste(as.numeric(1))
 
-  return(print('...checking function: calculate_abundance()'))
-  return(print('function complete, high five!'))
+  cmdf <- combined.df.clean %>% group_by(year)
+  cmdf <- cmdf %>% filter(scientificName!="")
+  cmdf$count <- as.numeric(cmdf$count)
+  cmdf.sum <- cmdf %>% summarise(year_count=sum(count))
+
+  p1 <- ggplot(data = cmdf.sum)+geom_bar(aes(x=year,y=year_count,fill=year),stat = "identity")+ylab("Bird Count")+theme_bw(base_size = 16)
+
+  write.csv(cmdf,file = "cmdf.csv",row.names = FALSE)
+  write.csv(cmdf.sum,file = "abundance.csv",row.names = FALSE)
+
+  return(p1)
 
 } # end of function calculate_abundance
 # --------------------------------------

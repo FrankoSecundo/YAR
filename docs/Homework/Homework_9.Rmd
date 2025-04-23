@@ -23,11 +23,6 @@ library(stringr)
 
 ```
 
-```{r}
-# and using the upscaler package we will create a folder
-
-add_folder()
-```
 
 ```{r}
 # I put the data into the originalData folder for access but within that we only essentially want one file which is the count data. we will pull out the file names for each
@@ -53,16 +48,61 @@ c.file.l <- c.file.l[2:11]
 print(c.file.l)
 
 ```
+```{r}
+
+source_batch(folder = "Functions/")
+
+```
+```{r}
+clean_data()
+
+```
+
+```{r}
+extract_year()
+```
+
+```{r}
+calculate_abundance()
+
+# show abundance values
+
+print(read.csv(file = "abundance.csv",header = TRUE,sep = ","))
+
+```
+
+```{r}
+calculate_richness()
+
+#show richness values
+
+print(read.csv(file = "speciesrichness.csv",header = TRUE,sep = ","))
+```
+
+```{r}
+
+run_regression()
+```
+
+below here are things that I did in upscaler to get everything setup
+
 
 ```{r}
 
 # Now that we have the file names we can make some pseudo code that will describe the order of operations for what we are going to do!
 
-build_function(c("clean_data","extract_year","calculate_abundance","calculate_richness","run_regression","generate_histograms"))
+# build_function(c("clean_data","extract_year","calculate_abundance","calculate_richness","run_regression","generate_histograms"))
 
 ```
 
 ```{r}
+
+#### these are the things I did to make the
+
+# and using the upscaler package we will create a folder
+
+# add_folder()
+```
 
 
 

@@ -20,11 +20,12 @@ for(i in cl.names){
 
 years <- y[2:11]
 
+years
 
-return(print('...checking function: extract_year()'))
-return(print('the years available are'))
-return(print(years))
+return(print(years[3:10]))
 
 } # end of function extract_year
 # --------------------------------------
 # extract_year()
+
+years

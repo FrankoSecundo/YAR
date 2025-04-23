@@ -22,8 +22,6 @@ clean_data <- function(){
 
   }
 
-for(i in )
-
 return(print('...checking function: clean_data()'))
 
   return(print("Please check the Cleaned Data folder to see the csv files with missing values omitted"))
