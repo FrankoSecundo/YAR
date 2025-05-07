@@ -69,6 +69,12 @@ calculate_abundance()
 
 print(read.csv(file = "abundance.csv",header = TRUE,sep = ","))
 
+abu <- read.csv(file = "abundance.csv",header = TRUE,sep = ",")
+
+a1 <- ggplot(data = abu)+aes(x=year,y=year_count)+geom_bar(stat = "identity")+theme_bw()+ylab("Abundance")
+
+a1
+
 ```
 
 ```{r}
@@ -77,6 +83,12 @@ calculate_richness()
 #show richness values
 
 print(read.csv(file = "speciesrichness.csv",header = TRUE,sep = ","))
+
+ric <- read.csv(file = "speciesrichness.csv",header = TRUE,sep = ",")
+
+r1 <- ggplot(data = ric)+aes(x=year,y=speciescount)+geom_bar(stat = "identity")+theme_bw()+ylab("Richness")
+
+r1
 ```
 
 ```{r}
